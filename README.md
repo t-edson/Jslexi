@@ -7,10 +7,10 @@ This is very basic (however functional) lexer with some of 130 lines, aimed to b
 
 The use is very simple:
 
-´´´
+'''
   lex = new Jslexy();
   lex.init('Hello\nWorld "Hi".');
   while (lex.next()) {
     console.log(lex.toktyp + '->' + lex.tok);
   }
-´´´
+'''
