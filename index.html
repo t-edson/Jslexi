@@ -1,13 +1,6 @@
 <!DOCTYPE HTML><HTML>
    <HEAD>
-      <TITLE>Diatext</TITLE> <!--meta http-equiv="refresh" content="2" -->
-      <style>
-         h1 {color:blue; text-align: center;}
-         #mycanvas {
-            border: 1px solid gray;
-            width: 28rem;
-         }
-       </style>      
+      <TITLE>Jslexy</TITLE>
    </HEAD>
    <BODY>
       <script>
@@ -15,10 +8,8 @@
 Jslexy = function() {
     //Constant for token types
     const TK_SPACE   = 0;
-    const TK_COMMENT = 1;
     const TK_IDENTIF = 2;
     const TK_STRING  = 3;
-    const TK_OPERATOR= 4;
     const TK_NUMBER  = 5;
     const TK_EOL     = 6;
     const TK_OTHER   = 10;
@@ -107,8 +98,7 @@ Jslexy = function() {
                 c = this.line[this.col];
             } while (isAlpha(c));
             this.toktyp = TK_IDENTIF;
-        } 
-        else if (isDigit(c)) {  //Number
+        } else if (isDigit(c)) {  //Number
             this.tok = '';
             do {
                 this.tok += c;
@@ -117,8 +107,7 @@ Jslexy = function() {
                 c = this.line[this.col];
             } while (isDigit(c));
             this.toktyp = TK_NUMBER;
-        } 
-        else if (c==' ' || c=="\t") {  //Spaces
+        } else if (c==' ' || c=="\t") {  //Spaces
             this.tok = '';
             do {
                 this.tok += c;
@@ -127,8 +116,7 @@ Jslexy = function() {
                 c = this.line[this.col];
             } while (c==' ' || c=="\t");
             this.toktyp = TK_SPACE;
-        }
-        else if (c=='"') {  //String
+        } else if (c=='"') {  //String
             this.tok = '';
             do {
                 this.tok += c;
@@ -139,8 +127,7 @@ Jslexy = function() {
             this.tok += c;
             this.col++;
             this.toktyp = TK_STRING;
-        }
-        else {  //Other
+        } else {  //Other
             this.tok = this.line[this.col];  //take character
             this.col++;
             this.toktyp = TK_OTHER;
