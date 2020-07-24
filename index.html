@@ -1,0 +1,159 @@
+<!DOCTYPE HTML><HTML>
+   <HEAD>
+      <TITLE>Diatext</TITLE> <!--meta http-equiv="refresh" content="2" -->
+      <style>
+         h1 {color:blue; text-align: center;}
+         #mycanvas {
+            border: 1px solid gray;
+            width: 28rem;
+         }
+       </style>      
+   </HEAD>
+   <BODY>
+      <script>
+//Lexer object definition
+Jslexy = function() {
+    //Constant for token types
+    const TK_SPACE   = 0;
+    const TK_COMMENT = 1;
+    const TK_IDENTIF = 2;
+    const TK_STRING  = 3;
+    const TK_OPERATOR= 4;
+    const TK_NUMBER  = 5;
+    const TK_EOL     = 6;
+    const TK_OTHER   = 10;
+    //Internal variables
+    lines = null; //Container array for text
+    line  = '';   //Current line.
+    tok   = '';   //Current token
+    toktyp = 0;   //Current token type
+    max_rows= 0;  //Number of lines.
+    max_cols= 0;  //Max. numbers of chars in the current line.
+    //Cursor of the scanner
+    row = 0,      //Position for line. Starts at 0.
+    col = 0,      //Position for char. Starts at 0.
+    //Private methods
+    isAlpha = function (c) {
+      return (c === '_' || c === '-' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+    };
+    isDigit = function (c) {
+        return (c >= '0' && c <= '9');
+    };  
+    //Public methods
+    this.init = function(source) {
+          if (source=='') {
+            this.lines = [];
+            this.line = '';
+            this.max_rows = 0;
+            this.max_cols = 0;
+            this.row = 0;
+            this.col = 0;
+          } else {
+            this.lines = source
+              .replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+            this.line = this.lines[0];
+            this.max_rows = this.lines.length;
+            this.max_cols = this.line.length;
+            this.row = 0;
+            this.col = 0;
+          }
+      }
+    this.eol = function() {
+        //Returns TRUE if we have arrived to the end of the current line.
+        return (this.col>=this.max_cols);
+      }
+    this.eof = function() {
+        //Returns TRUE if we have arrived to the end of the content.
+        if (this.row > this.max_rows-1) {
+            return true;    //Se pasó de la última línea
+        } else if (this.row == this.max_rows-1) { //En la última línea
+            return this.eol();
+        }
+      }
+    this.nextLine = function () {
+        //Jump scanner to next line. Updates "row", "col" and "line".
+        var me = this;
+          if (me.row >= me.max_rows-1) { //It's in last row
+              me.line = '';   //Doesn't change this.col.
+          } else {  //Can advance to next line
+            me.row += 1;
+            me.line = me.lines[me.row];
+            me.max_cols = me.line.length;
+            me.col = 0;
+          }
+      }
+    this.next = function() {
+        /*Updates "tok" and jump to the begin of the next token. If there is
+        no more tokens, returns false. */
+        if (this.eof()) {  //End of text
+            this.tok = '';
+            return false;
+        }
+        if (this.eol()) {  //End of line
+            this.nextLine();
+            //Uncomment this, for considering the end of line as a token
+            this.tok = '';
+            this.toktyp = TK_EOL;
+            return true;
+        }
+        //It's a common char
+        var c = this.line[this.col];
+        if (isAlpha(c)) {  //Identifier
+            this.tok = '';
+            do {
+                this.tok += c;
+                this.col++;
+                if (this.eol() || this.eof()) break;
+                c = this.line[this.col];
+            } while (isAlpha(c));
+            this.toktyp = TK_IDENTIF;
+        } 
+        else if (isDigit(c)) {  //Number
+            this.tok = '';
+            do {
+                this.tok += c;
+                this.col++;
+                if (this.eol() || this.eof()) break;
+                c = this.line[this.col];
+            } while (isDigit(c));
+            this.toktyp = TK_NUMBER;
+        } 
+        else if (c==' ' || c=="\t") {  //Spaces
+            this.tok = '';
+            do {
+                this.tok += c;
+                this.col++;
+                if (this.eol() || this.eof()) break;
+                c = this.line[this.col];
+            } while (c==' ' || c=="\t");
+            this.toktyp = TK_SPACE;
+        }
+        else if (c=='"') {  //String
+            this.tok = '';
+            do {
+                this.tok += c;
+                this.col++;
+                if (this.eol() || this.eof()) break;
+                c = this.line[this.col];
+            } while (c!='"');
+            this.tok += c;
+            this.col++;
+            this.toktyp = TK_STRING;
+        }
+        else {  //Other
+            this.tok = this.line[this.col];  //take character
+            this.col++;
+            this.toktyp = TK_OTHER;
+        }
+        return true;
+      }
+  };
+
+  lex = new Jslexy();
+  lex.init('Hello\nWorld "Hi".');
+  while (lex.next()) {
+    console.log(lex.toktyp + '->' + lex.tok);
+  }
+      </script>
+   </BODY>
+</HTML>
