@@ -1,5 +1,5 @@
 # Jslexi
-Small Javascript lexer implemented in a class.
+Small JavaScript lexer implemented in a class.
 
 The lexer is implemented in the function/class "Jslexy" included as part of the script in the index.html file, where there is a sample of use too.
 
